@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.swxz.mapper.ClaimedItemMapper">
+
+    <select id="getPendingClaims" resultType="com.example.swxz.dto.PendingClaimResponse">
+        SELECT 
+            id,
+            original_lost_item_id as originalLostItemId,
+            name,
+            type,
+            color,
+            description,
+            found_location as foundLocation,
+            building,
+            specific_location as specificLocation,
+            image_url as imageUrl,
+            publish_time as publishTime,
+            apply_time as applyTime,
+            claim_status as claimStatus,
+            claimer_student_id as claimerStudentId,
+            claimer_name as claimerName,
+            claimer_phone as claimerPhone
+        FROM claimed_items 
+        WHERE admin_id = #{adminId} 
+        AND claim_status = 'PENDING'
+        ORDER BY apply_time DESC
+    </select>
+
+</mapper>
