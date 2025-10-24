@@ -79,7 +79,7 @@ public class UserServiceImpl implements UserService {
         RegisterResponse response = new RegisterResponse();
         response.setId(user.getId());
         response.setStudentId(user.getStudentId());
-        response.setUsername(user.getUsername());
+        response.setUsername(user.getUsername()); 
         response.setCollege(user.getCollege());
         response.setPhone(user.getPhone());
         response.setCreateTime(user.getCreateTime());

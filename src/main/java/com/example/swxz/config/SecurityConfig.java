@@ -40,6 +40,9 @@ public class SecurityConfig {
             
             // 配置授权规则
             .authorizeHttpRequests(auth -> auth
+                // 新增静态资源放行规则
+                .requestMatchers("/uploads/**").permitAll()
+
                 // 允许登录接口无需认证
                 .requestMatchers("/api/user/login", "/api/admin/lost-item/login", "/api/admin/super/login").permitAll()
                 

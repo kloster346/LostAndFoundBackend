@@ -19,9 +19,9 @@ public class JwtConfig {
 
     /**
      * JWT过期时间（毫秒）
-     * 默认2小时 = 2 * 60 * 60 * 1000 = 7200000毫秒
+     * 默认7天 = 7 * 24 * 60 * 60 * 1000 = 604800000L毫秒
      */
-    private Long expiration = 7200000L;
+    private Long expiration = 604800000L;
 
     /**
      * JWT签发者
