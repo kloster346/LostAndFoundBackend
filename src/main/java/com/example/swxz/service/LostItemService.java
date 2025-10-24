@@ -28,4 +28,6 @@ public interface LostItemService {
     IPage<PendingClaimResponse> getPendingClaims(Long adminId, Integer pageNum, Integer pageSize);
     
     boolean approveClaim(Long adminId, ClaimApprovalRequest request);
+
+    LostItem updateLostItem(Long id, Long adminId, boolean isSuperAdmin, LostItemRequest request, org.springframework.web.multipart.MultipartFile image);
 }

@@ -80,6 +80,61 @@ public class LostItemServiceImpl implements LostItemService {
     public LostItem getLostItemById(Long id) {
         return lostItemMapper.selectById(id);
     }
+
+    @Override
+    public LostItem updateLostItem(Long id, Long adminId, boolean isSuperAdmin, com.example.swxz.dto.LostItemRequest request, org.springframework.web.multipart.MultipartFile image) {
+        LostItem lostItem = lostItemMapper.selectById(id);
+        if (lostItem == null) {
+            return null;
+        }
+        // 已领取则不允许修改
+        if (lostItem.getIsClaimed() != null && lostItem.getIsClaimed() == 1) {
+            return null;
+        }
+        // 权限：超级管理员可以修改任何，普通管理员只能修改自己发布的
+        if (!isSuperAdmin && (lostItem.getAdminId() == null || !lostItem.getAdminId().equals(adminId))) {
+            return null;
+        }
+
+        // 更新基本字段（仅在提供时覆盖）
+        if (request.getName() != null) {
+            lostItem.setName(request.getName());
+        }
+        if (request.getType() != null) {
+            lostItem.setType(request.getType());
+        }
+        if (request.getColor() != null) {
+            lostItem.setColor(request.getColor());
+        }
+        if (request.getDescription() != null) {
+            lostItem.setDescription(request.getDescription());
+        }
+        if (request.getBuilding() != null) {
+            lostItem.setBuilding(request.getBuilding());
+        }
+        if (request.getSpecificLocation() != null) {
+            lostItem.setSpecificLocation(request.getSpecificLocation());
+        }
+
+        // 重新构建捡到地点字符串（当楼栋或具体位置变化时）
+        if (request.getBuilding() != null || request.getSpecificLocation() != null) {
+            String foundLocation = "[" + getBuildingName(lostItem.getBuilding()) + "]";
+            if (lostItem.getSpecificLocation() != null && !lostItem.getSpecificLocation().isEmpty()) {
+                foundLocation += lostItem.getSpecificLocation();
+            }
+            lostItem.setFoundLocation(foundLocation);
+        }
+
+        // 处理图片更新
+        if (image != null && !image.isEmpty()) {
+            String imageUrl = saveImage(image);
+            lostItem.setImageUrl(imageUrl);
+        }
+
+        lostItem.setUpdateTime(java.time.LocalDateTime.now());
+        lostItemMapper.updateById(lostItem);
+        return lostItem;
+    }
     
     @Override
     public boolean deleteLostItem(Long id, Long adminId, boolean isSuperAdmin) {

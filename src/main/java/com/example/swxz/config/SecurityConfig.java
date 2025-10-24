@@ -52,6 +52,9 @@ public class SecurityConfig {
                 // 允许失物查看相关接口无需认证（公开访问）
                 .requestMatchers("/api/lost-items/all", "/api/lost-items/search", "/api/lost-items/{id}").permitAll()
                 
+                // PUT 编辑接口仅限管理员/超级管理员
+                .requestMatchers(org.springframework.http.HttpMethod.PUT, "/api/lost-items/*").hasAnyRole("LOST_ITEM_ADMIN", "SUPER_ADMIN")
+                
                 // 允许Swagger相关接口
                 .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**", "/webjars/**").permitAll()
                 

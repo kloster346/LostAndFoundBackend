@@ -31,13 +31,24 @@ public class LostItemController {
     }
     
     @GetMapping("/{id}")
-    @Operation(summary = "获取失物详情")
-    public Result<LostItem> getLostItem(@PathVariable Long id) {
-        LostItem lostItem = lostItemService.getLostItemById(id);
-        if (lostItem == null) {
-            return Result.error("失物不存在");
+    @Operation(summary = "根据ID获取失物详情")
+    public Result<LostItem> getById(@PathVariable Long id) {
+        LostItem item = lostItemService.getLostItemById(id);
+        return item != null ? Result.success(item) : Result.error("未找到失物");
+    }
+
+    @PutMapping("/{id}")
+    @Operation(summary = "更新失物")
+    public Result<LostItem> updateLostItem(@PathVariable Long id,
+                                           @RequestParam Long adminId,
+                                           @RequestParam(defaultValue = "false") boolean isSuperAdmin,
+                                           @ModelAttribute com.example.swxz.dto.LostItemRequest request,
+                                           @RequestParam(value = "image", required = false) org.springframework.web.multipart.MultipartFile image) {
+        LostItem updated = lostItemService.updateLostItem(id, adminId, isSuperAdmin, request, image);
+        if (updated == null) {
+            return Result.error("更新失败");
         }
-        return Result.success(lostItem);
+        return Result.success(updated);
     }
     
     @PostMapping("/publish")
