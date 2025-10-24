@@ -37,6 +37,11 @@ public class LostItem {
     
     @Schema(description = "图片路径")
     private String imageUrl;
+
+    // 存储时只存文件名，读取时动态拼接域名
+    public String getImageUrl() {
+        return this.imageUrl;
+    }
     
     @Schema(description = "发布到平台时间")
     private java.time.LocalDateTime publishTime;

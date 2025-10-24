@@ -1,7 +1,9 @@
 package com.example.swxz.util;
 
+import com.example.swxz.service.TokenBlacklistService;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -26,7 +28,7 @@ public class JwtUtil {
     /**
      * JWT过期时间（毫秒）- 2小时
      */
-    @Value("${jwt.expiration:7200000}")
+    @Value("${jwt.expiration:604800000}")
     private Long expiration;
 
     /**
@@ -34,6 +36,9 @@ public class JwtUtil {
      */
     @Value("${jwt.issuer:swxz-system}")
     private String issuer;
+
+    @Autowired
+    private TokenBlacklistService tokenBlacklistService;
 
     /**
      * 获取签名密钥
@@ -120,11 +125,11 @@ public class JwtUtil {
      */
     public Date getExpirationDateFromToken(String token) {
         return getClaimsFromToken(token).getExpiration();
-    } 
+    }
 
     /**
      * 从token中获取所有声明
-     *  
+     * 
      * @param token JWT token
      * @return Claims对象
      */
@@ -164,6 +169,11 @@ public class JwtUtil {
      */
     public Boolean validateToken(String token, String username) {
         try {
+            // 检查token是否在黑名单中
+            if (tokenBlacklistService.isTokenBlacklisted(token)) {
+                return false;
+            }
+            
             String tokenUsername = getUsernameFromToken(token);
             return (username.equals(tokenUsername) && !isTokenExpired(token));
         } catch (Exception e) {
@@ -172,8 +182,19 @@ public class JwtUtil {
     }
 
     /**
+     * 使token失效（加入黑名单）
+     *
+     * @param token 需要失效的token
+     */
+    public void invalidateToken(String token) {
+        if (token != null) {
+            tokenBlacklistService.addToBlacklist(token, getExpirationDateFromToken(token));
+        }
+    }
+
+    /**
      * 验证token格式和签名是否正确
-     * 
+     *
      * @param token JWT token
      * @return true表示有效，false表示无效
      */

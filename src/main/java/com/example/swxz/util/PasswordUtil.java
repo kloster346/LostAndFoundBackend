@@ -5,9 +5,9 @@ import org.springframework.stereotype.Component;
 
 /**
  * 密码工具类
- * 提供密码加密和验证功能 
+ * 提供密码加密和验证功能
  */
-@Component 
+@Component
 public class PasswordUtil {
 
     private static final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();

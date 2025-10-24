@@ -83,4 +83,35 @@ public class UserController {
         boolean exists = userService.isStudentIdExists(studentId);
         return Result.success(!exists);
     }
+
+    @PostMapping("/refresh-token")
+    @Operation(summary = "刷新token")
+    public Result<LoginResponse> refreshToken(@RequestHeader("Authorization") String authHeader) {
+        String token = jwtUtil.extractTokenFromHeader(authHeader);
+        if (token == null || !jwtUtil.validateTokenFormat(token)) {
+            return Result.error("无效的token");
+        }
+
+        try {
+            String newToken = jwtUtil.refreshToken(token);
+            Long userId = jwtUtil.getUserIdFromToken(newToken);
+            String username = jwtUtil.getUsernameFromToken(newToken);
+            String role = jwtUtil.getRoleFromToken(newToken);
+            
+            LoginResponse response = new LoginResponse(newToken, userId, username, role);
+            return Result.success(response);
+        } catch (Exception e) {
+            return Result.error("刷新token失败");
+        }
+    }
+
+    @PostMapping("/logout")
+    @Operation(summary = "用户注销")
+    public Result<Void> logout(@RequestHeader("Authorization") String authHeader) {
+        String token = jwtUtil.extractTokenFromHeader(authHeader);
+        if (token != null) {
+            jwtUtil.invalidateToken(token);
+        }
+        return Result.success();
+    }
 }

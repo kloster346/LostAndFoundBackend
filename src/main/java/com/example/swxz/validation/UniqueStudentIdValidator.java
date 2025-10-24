@@ -9,7 +9,7 @@ import jakarta.validation.ConstraintValidatorContext;
 
 /**
  * 学号唯一性验证器
- * 实现UniqueStudentId注解的验证逻辑 
+ * 实现UniqueStudentId注解的验证逻辑
  */
 @Component
 public class UniqueStudentIdValidator implements ConstraintValidator<UniqueStudentId, String> {
