@@ -12,6 +12,9 @@ import com.example.swxz.dto.UserSearchRequest;
 import com.example.swxz.dto.LostItemAdminSearchRequest;
 import com.example.swxz.dto.UserDetailResponse;
 import com.example.swxz.dto.LostItemAdminDetailResponse;
+// 新增导入
+import com.example.swxz.dto.LostItemOverviewResponse;
+import com.example.swxz.service.LostItemService;
 import com.example.swxz.entity.User;
 import com.example.swxz.entity.LostItemAdmin;
 import com.example.swxz.service.UserService;
@@ -55,6 +58,10 @@ public class SuperAdminController {
     @Autowired
     private LostItemAdminService lostItemAdminService;
 
+    // 新增：注入失物服务
+    @Autowired
+    private LostItemService lostItemService;
+
     @GetMapping("/users")
     @Operation(summary = "获取用户列表（超级管理员）")
     public com.example.swxz.common.Result<IPage<UserDetailResponse>> getUsers(UserSearchRequest request) {
@@ -75,6 +82,17 @@ public class SuperAdminController {
         java.util.List<LostItemAdminDetailResponse> records = page.getRecords().stream().map(this::toAdminDetail).toList();
         dtoPage.setRecords(records);
         return com.example.swxz.common.Result.success(dtoPage);
+    }
+
+    // 新增：超管获取所有失物（包含已领取与管理员名）
+    @GetMapping("/lost-items")
+    @Operation(summary = "获取所有失物（含领取人与管理员信息）")
+    public com.example.swxz.common.Result<IPage<LostItemOverviewResponse>> getAllLostItems(
+            @RequestParam(defaultValue = "1") Integer pageNum,
+            @RequestParam(defaultValue = "10") Integer pageSize,
+            @RequestParam(required = false) String keyword) {
+        IPage<LostItemOverviewResponse> page = lostItemService.getAllLostItemsWithDetails(pageNum, pageSize, keyword);
+        return com.example.swxz.common.Result.success(page);
     }
 
     private UserDetailResponse toUserDetail(User user) {

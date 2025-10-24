@@ -13,7 +13,7 @@ public interface LostItemService {
     
     IPage<LostItem> searchLostItems(LostItemSearchRequest searchRequest);
     
-    LostItem publishLostItem(Long adminId, LostItemRequest request, MultipartFile image);
+    LostItem publishLostItem(Long adminId, LostItemRequest request, org.springframework.web.multipart.MultipartFile image);
     
     LostItem getLostItemById(Long id);
     
@@ -30,4 +30,7 @@ public interface LostItemService {
     boolean approveClaim(Long adminId, ClaimApprovalRequest request);
 
     LostItem updateLostItem(Long id, Long adminId, boolean isSuperAdmin, LostItemRequest request, org.springframework.web.multipart.MultipartFile image);
+
+    // 新增：返回包含管理员与领取人信息的分页结果
+    com.baomidou.mybatisplus.core.metadata.IPage<com.example.swxz.dto.LostItemOverviewResponse> getAllLostItemsWithDetails(Integer pageNum, Integer pageSize, String keyword);
 }

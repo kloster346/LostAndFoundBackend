@@ -12,6 +12,10 @@ import com.example.swxz.entity.ClaimedItem;
 import com.example.swxz.entity.LostItem;
 import com.example.swxz.mapper.ClaimedItemMapper;
 import com.example.swxz.mapper.LostItemMapper;
+// 新增导入
+import com.example.swxz.mapper.LostItemAdminMapper;
+import com.example.swxz.entity.LostItemAdmin;
+import com.example.swxz.dto.LostItemOverviewResponse;
 import com.example.swxz.service.LostItemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,6 +28,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class LostItemServiceImpl implements LostItemService {
@@ -33,6 +38,10 @@ public class LostItemServiceImpl implements LostItemService {
     
     @Autowired
     private ClaimedItemMapper claimedItemMapper;
+
+    // 新增：注入管理员Mapper以获取用户名
+    @Autowired
+    private LostItemAdminMapper lostItemAdminMapper;
     
     @Value("${file.upload-dir}")
     private String uploadDir;
@@ -243,6 +252,48 @@ public class LostItemServiceImpl implements LostItemService {
         }
         
         return true;
+    }
+    
+    // 新增：返回包含管理员用户名与领取人信息的分页查询
+    @Override
+    public IPage<LostItemOverviewResponse> getAllLostItemsWithDetails(Integer pageNum, Integer pageSize, String keyword) {
+        Page<LostItem> page = new Page<>(pageNum, pageSize);
+        QueryWrapper<LostItem> wrapper = new QueryWrapper<>();
+        if (keyword != null && !keyword.isBlank()) {
+            wrapper.like("name", keyword);
+        }
+        wrapper.orderByDesc("create_time");
+        IPage<LostItem> lostPage = lostItemMapper.selectPage(page, wrapper);
+
+        Page<LostItemOverviewResponse> dtoPage = new Page<>(lostPage.getCurrent(), lostPage.getSize());
+        dtoPage.setTotal(lostPage.getTotal());
+        dtoPage.setRecords(lostPage.getRecords().stream().map(item -> {
+            LostItemOverviewResponse dto = new LostItemOverviewResponse();
+            dto.setId(item.getId());
+            dto.setName(item.getName());
+            dto.setType(item.getType());
+            dto.setColor(item.getColor());
+            dto.setDescription(item.getDescription());
+            dto.setFoundLocation(item.getFoundLocation());
+            dto.setBuilding(item.getBuilding());
+            dto.setSpecificLocation(item.getSpecificLocation());
+            dto.setImageUrl(item.getImageUrl());
+            dto.setPublishTime(item.getPublishTime());
+            dto.setIsClaimed(item.getIsClaimed());
+            dto.setClaimTime(item.getClaimTime());
+            dto.setAdminId(item.getAdminId());
+            // 管理员用户名
+            LostItemAdmin admin = item.getAdminId() != null ? lostItemAdminMapper.selectById(item.getAdminId()) : null;
+            dto.setAdminUsername(admin != null ? admin.getUsername() : null);
+            // 领取人信息（可能为空）
+            dto.setClaimerStudentId(item.getClaimerStudentId());
+            dto.setClaimerName(item.getClaimerName());
+            dto.setClaimerPhone(item.getClaimerPhone());
+            dto.setCreateTime(item.getCreateTime());
+            dto.setUpdateTime(item.getUpdateTime());
+            return dto;
+        }).collect(Collectors.toList()));
+        return dtoPage;
     }
     
     private String saveImage(MultipartFile image) {
