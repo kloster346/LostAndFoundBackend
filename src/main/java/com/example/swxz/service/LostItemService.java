@@ -6,7 +6,7 @@ import com.example.swxz.dto.ClaimRequest;
 import com.example.swxz.dto.LostItemRequest;
 import com.example.swxz.dto.LostItemSearchRequest;
 import com.example.swxz.dto.PendingClaimResponse;
-import com.example.swxz.entity.LostItem;
+import com.example.swxz.entity.LostItem; 
 import org.springframework.web.multipart.MultipartFile;
 
 public interface LostItemService {

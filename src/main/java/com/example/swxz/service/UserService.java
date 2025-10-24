@@ -4,7 +4,7 @@ import com.example.swxz.dto.RegisterRequest;
 import com.example.swxz.dto.RegisterResponse;
 import com.example.swxz.entity.User;
 
-public interface UserService {
+public interface UserService { 
     User login(String username, String password);
     User getUserById(Long id);
     User updateUser(User user);

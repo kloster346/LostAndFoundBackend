@@ -120,11 +120,11 @@ public class JwtUtil {
      */
     public Date getExpirationDateFromToken(String token) {
         return getClaimsFromToken(token).getExpiration();
-    }
+    } 
 
     /**
      * 从token中获取所有声明
-     * 
+     *  
      * @param token JWT token
      * @return Claims对象
      */
