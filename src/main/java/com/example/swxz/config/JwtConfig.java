@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Configuration;
 /**
  * JWT配置类
  * 用于管理JWT相关的配置参数
- */
+ */ 
 @Configuration
 @ConfigurationProperties(prefix = "jwt")
 public class JwtConfig {
